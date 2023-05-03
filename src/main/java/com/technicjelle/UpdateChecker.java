@@ -74,7 +74,7 @@ public final class UpdateChecker {
 	/**
 	 * This method logs a message to the console if an update is available<br>
 	 *
-	 * @param logger Logger to a potential update notification to
+	 * @param logger Logger to log a potential update notification to
 	 * @throws IllegalStateException If {@link #check(String, String, String)} has not been called
 	 */
 	public static void logUpdateMessage(Logger logger) throws IllegalStateException {
@@ -94,5 +94,9 @@ public final class UpdateChecker {
 	@Contract(pure = true)
 	private static @NotNull String removePrefix(@NotNull String version) {
 		return version.replaceFirst("^v", "");
+	}
+
+	private UpdateChecker() {
+		throw new IllegalStateException("Utility class");
 	}
 }

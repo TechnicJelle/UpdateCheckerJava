@@ -2,7 +2,7 @@
 A simple Java update checker for your application.
 
 ## Installation
-Visit the https://jitpack.io/#TechnicJelle/UpdateCheckerJava for details on how to install this library.
+Visit https://jitpack.io/#TechnicJelle/UpdateCheckerJava for details on how to install this library.
 
 ## Usage
 This library is very simple to use. Just call the `UpdateChecker.check()` method with your GitHub username,
@@ -17,3 +17,5 @@ UpdateChecker.check("TechnicJelle", "UpdateChecker", "v1.0");
 
 UpdateChecker.logUpdateMessage(getLogger());
 ```
+
+Full javadoc API reference: [technicjelle.com/UpdateCheckerJava](https://technicjelle.com/UpdateCheckerJava/com/technicjelle/UpdateChecker.html)
