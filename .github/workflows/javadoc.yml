@@ -1,8 +1,8 @@
 name: Generate JavaDoc and Deploy to Pages
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
