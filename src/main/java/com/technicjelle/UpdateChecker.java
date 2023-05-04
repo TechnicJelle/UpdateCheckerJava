@@ -24,12 +24,15 @@ public class UpdateChecker {
 	 * @param author         GitHub Username
 	 * @param repoName       GitHub Repository Name
 	 * @param currentVersion Current version of the program. This must be in the same format as the version tags on GitHub
-	 * @throws MalformedURLException If the URL is invalid, due to an invalid author and/or name
 	 */
-	public UpdateChecker(@NotNull String author, @NotNull String repoName, @NotNull String currentVersion) throws MalformedURLException {
+	public UpdateChecker(@NotNull String author, @NotNull String repoName, @NotNull String currentVersion) {
 		this.repoName = repoName;
 		this.currentVersion = removePrefix(currentVersion);
-		this.url = new URL("https://github.com/" + author + "/" + repoName + "/releases/latest");
+		try {
+			this.url = new URL("https://github.com/" + author + "/" + repoName + "/releases/latest");
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
