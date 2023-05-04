@@ -5,17 +5,16 @@ A simple Java update checker for your application.
 Visit https://jitpack.io/#TechnicJelle/UpdateCheckerJava for details on how to install this library.
 
 ## Usage
-This library is very simple to use. Just call the `UpdateChecker.check()` method with your GitHub username,
-repository name and current version to check for updates.
+Simply instantiate a new `UpdateChecker` object with your GitHub username, repository name and current version.
 
-You can then log the update message with `UpdateChecker.logUpdateMessage()`.
+Then call `.check()` or `.checkAsync()` on the instance to check for updates.
 
-There is also an async way to check for updates: `UpdateChecker.checkAsync()`.
+You can then log the update message with `logUpdateMessage()`.
 
 ```java
-UpdateChecker.check("TechnicJelle", "UpdateChecker", "v1.0");
-
-UpdateChecker.logUpdateMessage(getLogger());
+UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", "2.0");
+updateChecker.check();
+updateChecker.logUpdateMessage(getLogger());
 ```
 
 Full javadoc API reference: [technicjelle.com/UpdateCheckerJava](https://technicjelle.com/UpdateCheckerJava/com/technicjelle/UpdateChecker.html)
