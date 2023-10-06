@@ -18,3 +18,7 @@ updateChecker.logUpdateMessage(getLogger());
 ```
 
 Full javadoc API reference: [technicjelle.com/UpdateCheckerJava](https://technicjelle.com/UpdateCheckerJava/com/technicjelle/UpdateChecker.html)
+
+When using the async method, you, or your program's users, can override it to be synchronous anyway,
+by passing `-Dtechnicjelle.updatechecker.noasync` as a JVM argument.\
+Example: `java -Dtechnicjelle.updatechecker.noasync -jar server.jar`

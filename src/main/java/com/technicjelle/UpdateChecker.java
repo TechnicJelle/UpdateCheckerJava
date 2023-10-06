@@ -65,11 +65,22 @@ public class UpdateChecker {
 
 	/**
 	 * Checks for updates from a GitHub repository's releases<br>
-	 * <i>This method does not block the thread it is called from</i>
-	 *
+	 * <i>This method does not block the thread it is called from</i><br>
+	 * <br>Start your program with <code>-Dtechnicjelle.updatechecker.noasync</code> to disable async, and just always check synchronously
 	 * @see #check()
 	 */
 	public void checkAsync() {
+		String s = System.getProperty("technicjelle.updatechecker.noasync");
+
+		if (s != null) {
+			try {
+				check();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			return;
+		}
+
 		new Thread(() -> {
 			try {
 				check();
