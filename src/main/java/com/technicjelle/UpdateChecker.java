@@ -43,7 +43,8 @@ public class UpdateChecker {
 	 * @see #checkAsync()
 	 */
 	public void check() {
-		getLatestVersion();
+		checkAsync();
+		latestVersionFuture.join();
 	}
 
 	/**
