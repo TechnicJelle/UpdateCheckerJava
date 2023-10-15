@@ -108,6 +108,16 @@ public class UpdateChecker {
 	}
 
 	/**
+	 * This method logs a message to the console if an update is available, asynchronously<br>
+	 *
+	 * @param logger Logger to log a potential update notification to
+	 */
+	public synchronized void logUpdateMessageAsync(@NotNull Logger logger) {
+		if (latestVersionFuture == null) checkAsync();
+		latestVersionFuture.thenRun(() -> logUpdateMessage(logger));
+	}
+
+	/**
 	 * Removes a potential <code>v</code> prefix from a version
 	 *
 	 * @param version Version to remove the prefix from
