@@ -49,8 +49,7 @@ public class UpdateChecker {
 
 	/**
 	 * Checks for updates from a GitHub repository's releases<br>
-	 * <i>This method does not block the thread it is called from</i><br>
-	 * <br>Start your program with <code>-Dtechnicjelle.updatechecker.noasync</code> to disable async, and just always check synchronously
+	 * <i>This method does not block the thread it is called from</i>
 	 * @see #check()
 	 */
 	public void checkAsync() {
