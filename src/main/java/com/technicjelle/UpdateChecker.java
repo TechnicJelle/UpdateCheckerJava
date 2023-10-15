@@ -7,18 +7,20 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 /**
  * Checks for updates on a GitHub repository
  */
 public class UpdateChecker {
-	private final String repoName;
+
 	private final String currentVersion;
 	private final URL url;
 
-	private boolean updateAvailable = false;
-	private String latestVersion = null;
+	private transient CompletableFuture<String> latestVersionFuture = null;
 
 	/**
 	 * @param author         GitHub Username
@@ -26,7 +28,6 @@ public class UpdateChecker {
 	 * @param currentVersion Current version of the program. This must be in the same format as the version tags on GitHub
 	 */
 	public UpdateChecker(@NotNull String author, @NotNull String repoName, @NotNull String currentVersion) {
-		this.repoName = repoName;
 		this.currentVersion = removePrefix(currentVersion);
 		try {
 			this.url = new URL("https://github.com/" + author + "/" + repoName + "/releases/latest");
@@ -39,28 +40,10 @@ public class UpdateChecker {
 	 * Checks for updates from a GitHub repository's releases<br>
 	 * <i>This method blocks the thread it is called from</i>
 	 *
-	 * @throws IOException If an IO exception occurs
 	 * @see #checkAsync()
 	 */
-	public void check() throws IOException {
-		// Connect to GitHub website
-		HttpURLConnection con;
-		con = (HttpURLConnection) url.openConnection();
-		con.setInstanceFollowRedirects(false);
-
-		// Check if the response is a redirect
-		String newUrl = con.getHeaderField("Location");
-
-		if (newUrl == null) {
-			throw new IOException("Did not get a redirect");
-		}
-
-		// Get the latest version tag from the redirect url
-		String[] split = newUrl.split("/");
-		latestVersion = removePrefix(split[split.length - 1]);
-
-		// Check if the latest version is not the current version
-		if (!latestVersion.equals(currentVersion)) updateAvailable = true;
+	public void check() {
+		getLatestVersion();
 	}
 
 	/**
@@ -70,36 +53,56 @@ public class UpdateChecker {
 	 * @see #check()
 	 */
 	public void checkAsync() {
-		String s = System.getProperty("technicjelle.updatechecker.noasync");
+		latestVersionFuture = CompletableFuture.supplyAsync(this::fetchLatestVersion);
+	}
 
-		if (s != null) {
-			try {
-				check();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+	/**
+	 * Checks if necessary and returns the latest available version
+	 * @return the latest available version
+	 */
+	public synchronized String getLatestVersion() {
+		if (latestVersionFuture == null) checkAsync();
+		return latestVersionFuture.join();
+	}
+
+	private String fetchLatestVersion() {
+		try {
+			// Connect to GitHub website
+			HttpURLConnection con;
+			con = (HttpURLConnection) url.openConnection();
+			con.setInstanceFollowRedirects(false);
+
+			// Check if the response is a redirect
+			String newUrl = con.getHeaderField("Location");
+
+			if (newUrl == null) {
+				throw new IOException("Did not get a redirect");
 			}
-			return;
+
+			// Get the latest version tag from the redirect url
+			String[] split = newUrl.split("/");
+			return removePrefix(split[split.length - 1]);
+		} catch (IOException ex) {
+			throw new CompletionException("Exception trying to fetch the latest version", ex);
 		}
+	}
 
-		new Thread(() -> {
-			try {
-				check();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}, repoName + "-Update-Checker").start();
+	/**
+	 * Checks if necessary and returns weather an update is available or not
+	 * @return <code>true</code> if there is an update available or <code>false</code> otherwise.
+	 */
+	public boolean isUpdateAvailable() {
+		return !getLatestVersion().equals(currentVersion);
 	}
 
 	/**
 	 * This method logs a message to the console if an update is available<br>
 	 *
 	 * @param logger Logger to log a potential update notification to
-	 * @throws IllegalStateException If {@link #check()} has not been called
 	 */
-	public void logUpdateMessage(@NotNull Logger logger) throws IllegalStateException {
-		if (latestVersion == null) throw new IllegalStateException("check() has not been called");
-		if (updateAvailable) {
-			logger.warning("New version available: v" + latestVersion + " (current: v" + currentVersion + ")");
+	public void logUpdateMessage(@NotNull Logger logger) {
+		if (isUpdateAvailable()) {
+			logger.warning("New version available: v" + getLatestVersion() + " (current: v" + currentVersion + ")");
 			logger.warning("Download it at " + url);
 		}
 	}
