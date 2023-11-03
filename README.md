@@ -1,5 +1,5 @@
 # Java Update Checker
-A simple Java update checker for your application.
+A simple update checker for your Java application.
 
 ## Installation
 Visit https://jitpack.io/#TechnicJelle/UpdateCheckerJava for details on how to install this library.
