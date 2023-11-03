@@ -49,6 +49,7 @@ public class UpdateChecker {
 	/**
 	 * Checks for updates from a GitHub repository's releases<br>
 	 * <i>This method does not block the thread it is called from</i>
+	 *
 	 * @see #check()
 	 */
 	public void checkAsync() {
@@ -57,6 +58,7 @@ public class UpdateChecker {
 
 	/**
 	 * Checks if necessary and returns the latest available version
+	 *
 	 * @return the latest available version
 	 */
 	public synchronized String getLatestVersion() {
@@ -87,7 +89,8 @@ public class UpdateChecker {
 	}
 
 	/**
-	 * Checks if necessary and returns weather an update is available or not
+	 * Checks if necessary and returns whether an update is available or not
+	 *
 	 * @return <code>true</code> if there is an update available or <code>false</code> otherwise.
 	 */
 	public boolean isUpdateAvailable() {
