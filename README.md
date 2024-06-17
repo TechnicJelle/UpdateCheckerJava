@@ -14,7 +14,7 @@ You can then log the update message with `logUpdateMessage()` or `logUpdateMessa
 ```java
 UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", "2.0");
 updateChecker.check();
-updateChecker.logUpdateMessage(getLogger());
+updateChecker.logUpdateMessage(logger);
 ```
 
 Full javadoc API reference: [technicjelle.com/UpdateCheckerJava](https://technicjelle.com/UpdateCheckerJava/com/technicjelle/UpdateChecker.html)

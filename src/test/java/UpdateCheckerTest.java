@@ -2,8 +2,11 @@ import com.technicjelle.UpdateChecker;
 import org.junit.Test;
 
 import java.util.concurrent.CompletionException;
+import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class UpdateCheckerTest {
 	@Test
@@ -11,6 +14,8 @@ public class UpdateCheckerTest {
 		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", "2.3");
 		updateChecker.check();
 		assertFalse(updateChecker.isUpdateAvailable());
+		Logger logger = Logger.getLogger("UpdateCheckerJava");
+		updateChecker.logUpdateMessage(logger);
 	}
 
 	@Test
@@ -19,6 +24,9 @@ public class UpdateCheckerTest {
 		updateChecker.checkAsync();
 		Thread.sleep(1000);
 		assertTrue(updateChecker.isUpdateAvailable());
+		Logger logger = Logger.getLogger("UpdateCheckerJava");
+		updateChecker.logUpdateMessageAsync(logger);
+		Thread.sleep(1000);
 	}
 
 	@Test
@@ -38,7 +46,7 @@ public class UpdateCheckerTest {
 
 	@Test
 	public void testBroken() {
-		assertThrows(CompletionException.class , () -> {
+		assertThrows(CompletionException.class, () -> {
 			UpdateChecker updateChecker = new UpdateChecker("akalscmlakmc", "knkasnckasnc", "42");
 			updateChecker.check();
 		});
