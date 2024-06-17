@@ -9,9 +9,11 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class UpdateCheckerTest {
+	private static final String LATEST_VERSION = "v2.4";
+
 	@Test
 	public void testUpToDate() {
-		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", "2.3");
+		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", LATEST_VERSION);
 		updateChecker.check();
 		assertFalse(updateChecker.isUpdateAvailable());
 		Logger logger = Logger.getLogger("UpdateCheckerJava");
@@ -57,7 +59,7 @@ public class UpdateCheckerTest {
 	@Test
 	public void testDisabledUpToDate() {
 		System.setProperty(DISABLED_PROPERTY, "");
-		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", "2.3");
+		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", LATEST_VERSION);
 		updateChecker.check();
 		assertFalse(updateChecker.isUpdateAvailable()); //when disabled, there is never an update available
 		Logger logger = Logger.getLogger("UpdateCheckerJava");
