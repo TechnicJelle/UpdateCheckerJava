@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Logger;
@@ -24,6 +25,7 @@ public class UpdateChecker {
 
 	/**
 	 * Start the program with <code>-Dtechnicjelle.updatechecker.disabled</code> to disable the update checker
+	 *
 	 * @param author         GitHub Username
 	 * @param repoName       GitHub Repository Name
 	 * @param currentVersion Current version of the program. This must be in the same format as the version tags on GitHub
@@ -102,15 +104,54 @@ public class UpdateChecker {
 	}
 
 	/**
+	 * Checks if necessary and returns a message if an update is available.<br>
+	 * The message will contain the latest version and a link to the GitHub releases page.<br>
+	 * Useful if you don't use Java's own {@link java.util.logging.Logger} and you want to use your own.<br>
+	 * Example:<br>
+	 * <code>New version available: v2.5 (current: v2.4)<br>
+	 * Download it at <a href="https://github.com/TechnicJelle/UpdateCheckerJava/releases/latest">https://github.com/TechnicJelle/UpdateCheckerJava/releases/latest</a></code>
+	 *
+	 * @return An optional containing the update message or an empty optional if there is no update available
+	 */
+	public Optional<String> getUpdateMessage() {
+		if (isUpdateAvailable()) {
+			return Optional.of("New version available: v" + getLatestVersion() + " (current: v" + currentVersion + ")\nDownload it at " + url);
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Gets the current version of the program.<br>
+	 * Useful in case you want to log a custom message.<br>
+	 * <br>
+	 * Does not actually check for updates
+	 *
+	 * @return The current version of the program
+	 */
+	public String getCurrentVersion() {
+		return currentVersion;
+	}
+
+	/**
+	 * Gets the URL to the GitHub releases page,
+	 * where the latest version can be downloaded.<br>
+	 * Useful in case you want to log a custom message.<br>
+	 * <br>
+	 * Does not actually check for updates
+	 *
+	 * @return The URL to the GitHub releases page
+	 */
+	public String getUpdateUrl() {
+		return url.toString();
+	}
+
+	/**
 	 * This method logs a message to the console if an update is available<br>
 	 *
 	 * @param logger Logger to log a potential update notification to
 	 */
 	public void logUpdateMessage(@NotNull Logger logger) {
-		if (isUpdateAvailable()) {
-			logger.warning("New version available: v" + getLatestVersion() + " (current: v" + currentVersion + ")");
-			logger.warning("Download it at " + url);
-		}
+		getUpdateMessage().ifPresent(logger::warning);
 	}
 
 	/**
