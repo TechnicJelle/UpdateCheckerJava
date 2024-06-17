@@ -51,4 +51,29 @@ public class UpdateCheckerTest {
 			updateChecker.check();
 		});
 	}
+
+	private static final String DISABLED_PROPERTY = "technicjelle.updatechecker.disabled";
+
+	@Test
+	public void testDisabledUpToDate() {
+		System.setProperty(DISABLED_PROPERTY, "");
+		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", "2.3");
+		updateChecker.check();
+		assertFalse(updateChecker.isUpdateAvailable()); //when disabled, there is never an update available
+		Logger logger = Logger.getLogger("UpdateCheckerJava");
+		updateChecker.logUpdateMessage(logger);
+		System.clearProperty(DISABLED_PROPERTY);
+	}
+
+	@Test
+	public void testDisabledOutdated() throws InterruptedException {
+		System.setProperty(DISABLED_PROPERTY, "");
+		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", "0.1");
+		updateChecker.check();
+		assertFalse(updateChecker.isUpdateAvailable()); //when disabled, there is never an update available
+		Logger logger = Logger.getLogger("UpdateCheckerJava");
+		updateChecker.logUpdateMessageAsync(logger);
+		Thread.sleep(1000);
+		System.clearProperty(DISABLED_PROPERTY);
+	}
 }

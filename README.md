@@ -18,3 +18,7 @@ updateChecker.logUpdateMessage(logger);
 ```
 
 Full javadoc API reference: [technicjelle.com/UpdateCheckerJava](https://technicjelle.com/UpdateCheckerJava/com/technicjelle/UpdateChecker.html)
+
+If you want to disable the update checker, you can do so
+by passing `-Dtechnicjelle.updatechecker.disabled` as a JVM argument.\
+Example: `java -Dtechnicjelle.updatechecker.disabled -jar server.jar`

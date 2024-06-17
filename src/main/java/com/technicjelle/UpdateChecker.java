@@ -18,16 +18,19 @@ public class UpdateChecker {
 
 	private final String currentVersion;
 	private final URL url;
+	private final boolean disabled;
 
 	private transient CompletableFuture<String> latestVersionFuture = null;
 
 	/**
+	 * Start the program with <code>-Dtechnicjelle.updatechecker.disabled</code> to disable the update checker
 	 * @param author         GitHub Username
 	 * @param repoName       GitHub Repository Name
 	 * @param currentVersion Current version of the program. This must be in the same format as the version tags on GitHub
 	 */
 	public UpdateChecker(@NotNull String author, @NotNull String repoName, @NotNull String currentVersion) {
 		this.currentVersion = removePrefix(currentVersion);
+		this.disabled = System.getProperty("technicjelle.updatechecker.disabled") != null;
 		try {
 			this.url = new URL("https://github.com/" + author + "/" + repoName + "/releases/latest");
 		} catch (MalformedURLException e) {
@@ -67,6 +70,7 @@ public class UpdateChecker {
 	}
 
 	private String fetchLatestVersion() {
+		if (disabled) return currentVersion;
 		try {
 			// Connect to GitHub website
 			HttpURLConnection con;
