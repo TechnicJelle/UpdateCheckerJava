@@ -27,7 +27,7 @@ public class UpdateCheckerTest {
 	public void testUpToDate() {
 		UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "UpdateCheckerJava", LATEST_VERSION);
 		updateChecker.check();
-		assertFalse(updateChecker.isUpdateAvailable());
+		assertFalse("git latest version: " + LATEST_VERSION + ", update checker latest version: " + updateChecker.getLatestVersion(), updateChecker.isUpdateAvailable());
 		Logger logger = Logger.getLogger("UpdateCheckerJava");
 		updateChecker.logUpdateMessage(logger);
 	}
