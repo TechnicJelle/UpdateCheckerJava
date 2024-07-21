@@ -1,6 +1,7 @@
 import com.technicjelle.UpdateChecker;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Logger;
 
@@ -9,7 +10,18 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class UpdateCheckerTest {
-	private static final String LATEST_VERSION = "v2.4";
+	private static final String LATEST_VERSION;
+
+	static {
+		try {
+			ProcessBuilder builder = new ProcessBuilder("git", "describe", "--tags", "--abbrev=0");
+			Process p = builder.start();
+			p.waitFor();
+			LATEST_VERSION = new String(p.getInputStream().readAllBytes()).trim();
+		} catch (IOException | InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Test
 	public void testUpToDate() {
