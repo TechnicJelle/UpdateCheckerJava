@@ -1,7 +1,6 @@
 import com.technicjelle.UpdateChecker;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Logger;
@@ -16,13 +15,10 @@ public class UpdateCheckerTest {
 	static {
 		try {
 			ProcessBuilder builder = new ProcessBuilder("git", "describe", "--tags", "--abbrev=0");
-			builder.directory(new File(System.getProperty("user.dir")));
-			System.out.println(builder.directory().getAbsolutePath());
 			Process p = builder.start();
-			p.waitFor();
 			LATEST_VERSION = new String(p.getInputStream().readAllBytes()).trim();
 			assertFalse("Could not get latest version from git", LATEST_VERSION.isEmpty());
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
