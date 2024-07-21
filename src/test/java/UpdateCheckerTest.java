@@ -15,14 +15,12 @@ public class UpdateCheckerTest {
 
 	static {
 		try {
-			ProcessBuilder builder = new ProcessBuilder("git", "tag", "--sort=taggerdate");
+			ProcessBuilder builder = new ProcessBuilder("git", "describe", "--tags", "--abbrev=0");
 			builder.directory(new File(System.getProperty("user.dir")));
 			System.out.println(builder.directory().getAbsolutePath());
 			Process p = builder.start();
 			p.waitFor();
-			String result = new String(p.getInputStream().readAllBytes());
-			String[] versions = result.split("\n");
-			LATEST_VERSION = versions[versions.length - 1].trim();
+			LATEST_VERSION = new String(p.getInputStream().readAllBytes()).trim();
 			assertFalse("Could not get latest version from git", LATEST_VERSION.isEmpty());
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException(e);
