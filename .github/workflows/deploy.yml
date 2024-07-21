@@ -1,0 +1,43 @@
+name: Deploy to BlueColored Repo
+
+on:
+  release:
+    types: [ released ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      TAG_NAME:
+        description: 'GitHub Tag Name (for comparing with project version)'
+        required: true
+
+env:
+  TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Check tag with project version
+        run: |
+          PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          # Remove 'v' prefix from tag name
+          TAG_VERSION=$(sed 's/^v//g' <<< "$TAG_NAME")
+          if [ "$PROJECT_VERSION" != "$TAG_VERSION" ]; then
+              echo "Project version ($PROJECT_VERSION) does not match tag ($TAG_VERSION)"
+              exit 1
+          fi
+      - name: Set up credentials
+        shell: bash
+        env:
+          PASSWORD: ${{ secrets.MAVEN_SECRET }}
+        run: echo "<settings><servers><server><id>bluecolored-releases</id><username>technicjelle</username><password>$PASSWORD</password></server></servers></settings>" > ~/.m2/settings.xml
+      - name: Deploy
+        run: mvn clean deploy
