@@ -17,9 +17,11 @@ public class UpdateCheckerTest {
 		try {
 			ProcessBuilder builder = new ProcessBuilder("git", "describe", "--tags", "--abbrev=0");
 			builder.directory(new File(System.getProperty("user.dir")));
+			System.out.println(builder.directory().getAbsolutePath());
 			Process p = builder.start();
 			p.waitFor();
 			LATEST_VERSION = new String(p.getInputStream().readAllBytes()).trim();
+			assertFalse("Could not get latest version from git", LATEST_VERSION.isEmpty());
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException(e);
 		}
