@@ -1,6 +1,7 @@
 import com.technicjelle.UpdateChecker;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Logger;
@@ -15,6 +16,7 @@ public class UpdateCheckerTest {
 	static {
 		try {
 			ProcessBuilder builder = new ProcessBuilder("git", "describe", "--tags", "--abbrev=0");
+			builder.directory(new File(System.getProperty("user.dir")));
 			Process p = builder.start();
 			p.waitFor();
 			LATEST_VERSION = new String(p.getInputStream().readAllBytes()).trim();
