@@ -29,6 +29,8 @@ Please see the javadoc for the full API reference:
 - latest release: https://repo.bluecolored.de/javadoc/releases/com/technicjelle/UpdateChecker/latest
   - Also has docs for previous releases (v2.5 and up)
 
+### Disabling
+
 If you want to disable the update checker, you can do so
 by passing `-Dtechnicjelle.updatechecker.disabled` as a JVM argument.\
 Example: `java -Dtechnicjelle.updatechecker.disabled -jar server.jar`
