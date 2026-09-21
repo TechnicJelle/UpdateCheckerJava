@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.logging.Logger;
 
 /**
  * Checks for updates on a GitHub repository
@@ -153,7 +152,7 @@ public class UpdateChecker {
 	 *
 	 * @param logger Logger to log a potential update notification to
 	 */
-	public void logUpdateMessage(@NotNull Logger logger) {
+	public void logUpdateMessage(@NotNull java.util.logging.Logger logger) {
 		getUpdateMessage().ifPresent(logger::warning);
 	}
 
@@ -162,7 +161,7 @@ public class UpdateChecker {
 	 *
 	 * @param logger Logger to log a potential update notification to
 	 */
-	public synchronized void logUpdateMessageAsync(@NotNull Logger logger) {
+	public synchronized void logUpdateMessageAsync(@NotNull java.util.logging.Logger logger) {
 		if (latestVersionFuture == null) checkAsync();
 		latestVersionFuture.thenRun(() -> logUpdateMessage(logger));
 	}
