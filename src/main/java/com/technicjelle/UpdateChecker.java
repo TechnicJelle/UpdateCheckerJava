@@ -52,7 +52,7 @@ public class UpdateChecker {
 
 	/**
 	 * Checks for updates from a GitHub repository's releases<br>
-	 * <i>This method does not block the thread it is called from</i>
+	 * <i>This method does <b>not</b> block the thread it is called from</i>
 	 *
 	 * @see #check()
 	 */
