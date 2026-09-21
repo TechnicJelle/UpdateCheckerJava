@@ -2,11 +2,13 @@ import com.technicjelle.UpdateChecker;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class UpdateCheckerTest {
@@ -75,6 +77,17 @@ public class UpdateCheckerTest {
 		assertTrue(thrown.get());
 		assertFalse(updateChecker.isUpdateAvailable());
 		assertTrue(updateChecker.getUpdateMessage().isEmpty());
+	}
+
+	@Test
+	public void testRepoDoesNotExistRethrow() {
+		// CompletionException is thrown because the future was interrupted with an exception (the new RuntimeException ↓)
+		assertThrows(CompletionException.class, () -> {
+			UpdateChecker updateChecker = new UpdateChecker("TechnicJelle", "ThisRepoDoesNotExist", "42", throwable -> {
+				throw new RuntimeException(throwable);
+			});
+			updateChecker.check();
+		});
 	}
 
 	@Test
