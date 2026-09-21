@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 /**
  * Checks for updates on a GitHub repository
@@ -18,6 +20,7 @@ public class UpdateChecker {
 
 	private final String currentVersion;
 	private final URL url;
+	private final Consumer<Throwable> onError;
 	private final boolean disabled;
 
 	private transient CompletableFuture<String> latestVersionFuture = null;
@@ -28,10 +31,17 @@ public class UpdateChecker {
 	 * @param author         GitHub Username
 	 * @param repoName       GitHub Repository Name
 	 * @param currentVersion Current version of the program. This must be in the same format as the version tags on GitHub
+	 * @param onError        Called when an internal error occurs. Use this to log the error using your logging system
 	 */
-	public UpdateChecker(@NotNull String author, @NotNull String repoName, @NotNull String currentVersion) {
+	public UpdateChecker(@NotNull String author, @NotNull String repoName, @NotNull String currentVersion, @NotNull Consumer<Throwable> onError) {
+		Objects.requireNonNull(author);
+		Objects.requireNonNull(repoName);
+		Objects.requireNonNull(currentVersion);
+		Objects.requireNonNull(onError);
+
 		this.currentVersion = removePrefix(currentVersion);
 		this.disabled = System.getProperty("technicjelle.updatechecker.disabled") != null;
+		this.onError = onError;
 		try {
 			this.url = new URL("https://github.com/" + author + "/" + repoName + "/releases/latest");
 		} catch (MalformedURLException e) {
@@ -92,7 +102,8 @@ public class UpdateChecker {
 			String[] split = newUrl.split("/");
 			return removePrefix(split[split.length - 1]);
 		} catch (IOException ex) {
-			throw new CompletionException("Exception trying to fetch the latest version", ex);
+			onError.accept(ex);
+			return currentVersion;
 		}
 	}
 
@@ -108,8 +119,17 @@ public class UpdateChecker {
 	/**
 	 * Checks if necessary and returns a message if an update is available.<br>
 	 * The message will contain the latest version and a link to the GitHub releases page.<br>
-	 * Useful if you don't use Java's own {@link java.util.logging.Logger} and you want to use your own.<br>
-	 * Example:<br>
+	 * <br>
+	 * I recommend that you use one of the log methods if you want to log the update message:
+	 * <ul>
+	 * 	<li>{@link #logUpdateMessage(Logger)}</li>
+	 * 	<li>{@link #logUpdateMessageAsync(Logger)}</li>
+	 * 	<li>{@link #logUpdateMessage(Consumer)}</li>
+	 * 	<li>{@link #logUpdateMessageAsync(Consumer)}</li>
+	 * </ul>
+	 * But this function remains available in case you want to use it manually.<br>
+	 * <br>
+	 * Example message:<br>
 	 * <code>New version available: v2.5 (current: v2.4)<br>
 	 * Download it at <a href="https://github.com/TechnicJelle/UpdateCheckerJava/releases/latest">https://github.com/TechnicJelle/UpdateCheckerJava/releases/latest</a></code>
 	 *
@@ -121,6 +141,59 @@ public class UpdateChecker {
 		}
 		return Optional.empty();
 	}
+
+	/**
+	 * This method logs a message to the console if an update is available<br>
+	 *
+	 * @param logger Logger to log a potential update notification to
+	 * @see #logUpdateMessageAsync(Logger)
+	 * @see #logUpdateMessage(Consumer)
+	 * @see #logUpdateMessageAsync(Consumer)
+	 */
+	public void logUpdateMessage(@NotNull java.util.logging.Logger logger) {
+		getUpdateMessage().ifPresent(logger::warning);
+	}
+
+	/**
+	 * This method logs a message to the console if an update is available, asynchronously<br>
+	 *
+	 * @param logger Logger to log a potential update notification to
+	 * @see #logUpdateMessage(Logger)
+	 * @see #logUpdateMessage(Consumer)
+	 * @see #logUpdateMessageAsync(Consumer)
+	 */
+	public synchronized void logUpdateMessageAsync(@NotNull java.util.logging.Logger logger) {
+		if (latestVersionFuture == null) checkAsync();
+		latestVersionFuture.thenRun(() -> logUpdateMessage(logger));
+	}
+
+	/**
+	 * This method logs a message to the console if an update is available<br>
+	 * Useful if you don't use Java's own {@link java.util.logging.Logger} and you want to use your own.
+	 *
+	 * @param logger Logger to log a potential update notification to
+	 * @see #logUpdateMessage(Logger)
+	 * @see #logUpdateMessageAsync(Logger)
+	 * @see #logUpdateMessageAsync(Consumer)
+	 */
+	public void logUpdateMessage(@NotNull Consumer<String> logger) {
+		getUpdateMessage().ifPresent(logger);
+	}
+
+	/**
+	 * This method logs a message to the console if an update is available, asynchronously<br>
+	 * Useful if you don't use Java's own {@link java.util.logging.Logger} and you want to use your own.
+	 *
+	 * @param logger Logger to log a potential update notification to
+	 * @see #logUpdateMessage(Logger)
+	 * @see #logUpdateMessageAsync(Logger)
+	 * @see #logUpdateMessage(Consumer)
+	 */
+	public synchronized void logUpdateMessageAsync(@NotNull Consumer<String> logger) {
+		if (latestVersionFuture == null) checkAsync();
+		latestVersionFuture.thenRun(() -> logUpdateMessage(logger));
+	}
+
 
 	/**
 	 * Gets the current version of the program.<br>
@@ -160,25 +233,6 @@ public class UpdateChecker {
 	 */
 	public String getUpdateUrl() {
 		return url.toString();
-	}
-
-	/**
-	 * This method logs a message to the console if an update is available<br>
-	 *
-	 * @param logger Logger to log a potential update notification to
-	 */
-	public void logUpdateMessage(@NotNull java.util.logging.Logger logger) {
-		getUpdateMessage().ifPresent(logger::warning);
-	}
-
-	/**
-	 * This method logs a message to the console if an update is available, asynchronously<br>
-	 *
-	 * @param logger Logger to log a potential update notification to
-	 */
-	public synchronized void logUpdateMessageAsync(@NotNull java.util.logging.Logger logger) {
-		if (latestVersionFuture == null) checkAsync();
-		latestVersionFuture.thenRun(() -> logUpdateMessage(logger));
 	}
 
 	/**
