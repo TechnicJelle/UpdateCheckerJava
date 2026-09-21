@@ -79,11 +79,14 @@ public class UpdateChecker {
 			con = (HttpURLConnection) url.openConnection();
 			con.setInstanceFollowRedirects(false);
 
+			// Check if connection succeeded by getting the response code
+			int code = con.getResponseCode();
+
 			// Check if the response is a redirect
 			String newUrl = con.getHeaderField("Location");
 
 			if (newUrl == null) {
-				throw new IOException("Did not get a redirect");
+				throw new IOException("Did not get a redirect (" + code + ")");
 			}
 
 			// Get the latest version tag from the redirect url
