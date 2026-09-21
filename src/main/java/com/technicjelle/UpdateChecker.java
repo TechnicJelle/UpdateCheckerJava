@@ -142,6 +142,21 @@ public class UpdateChecker {
 	 * Does not actually check for updates
 	 *
 	 * @return The URL to the GitHub releases page
+	 * @see #getUpdateUrl()
+	 */
+	public URL getUpdateURL() {
+		return url;
+	}
+
+	/**
+	 * Gets the URL to the GitHub releases page,
+	 * where the latest version can be downloaded.<br>
+	 * Useful in case you want to log a custom message.<br>
+	 * <br>
+	 * Does not actually check for updates
+	 *
+	 * @return The URL (as a String) to the GitHub releases page
+	 * @see #getUpdateURL()
 	 */
 	public String getUpdateUrl() {
 		return url.toString();
