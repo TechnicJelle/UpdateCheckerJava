@@ -4,6 +4,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -244,5 +246,19 @@ public class UpdateChecker {
 	@Contract(pure = true)
 	private static @NotNull String removePrefix(@NotNull String version) {
 		return version.replaceFirst("^v", "");
+	}
+
+	/**
+	 * Convenience function to convert a Throwable to a String, including the stacktrace.
+	 * Useful for when logging it.
+	 *
+	 * @param throwable The Throwable to convert to a String
+	 * @return The converted String
+	 */
+	@Contract(pure = true)
+	public static @NotNull String trace(@NotNull Throwable throwable) {
+		StringWriter sw = new StringWriter();
+		throwable.printStackTrace(new PrintWriter(sw));
+		return sw.toString().trim();
 	}
 }

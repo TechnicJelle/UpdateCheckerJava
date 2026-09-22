@@ -6,7 +6,7 @@
 
 	<groupId>com.technicjelle</groupId>
 	<artifactId>UpdateChecker</artifactId>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 
 	<properties>
 		<java.version>11</java.version>
